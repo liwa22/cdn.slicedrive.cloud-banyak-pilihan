@@ -408,9 +408,9 @@
     }
 
 
-    /* Semua thumbnail menggunakan rasio landscape 16:9 seperti YouTube. */
+    /* Portrait memakai rasio video asli; landscape tetap 16:9. */
     .video-container.portrait {
-      aspect-ratio: 16 / 9;
+      aspect-ratio: 9 / 16;
     }
 
 
@@ -796,7 +796,7 @@
     */
 
     const LAZY_ROOT_MARGIN =
-      "120px 0px";
+      "500px 0px";
 
 
     /*
@@ -987,85 +987,15 @@
 
 
     /* =====================================================
-       VIDEO UNLOAD OBSERVER
+       KEEP LOADED THUMBNAILS CACHED
+       Preview videos are intentionally NOT unloaded when scrolling away.
+       This prevents already-seen thumbnails from loading again on return.
     ====================================================== */
 
-    const unloadObserver =
-      new IntersectionObserver(
-        function(entries) {
-
-          entries.forEach(
-            function(entry) {
-
-              if (
-                entry.isIntersecting
-              ) {
-
-                return;
-
-              }
-
-
-              const video =
-                entry.target;
-
-
-              /*
-                Belum loaded -> tidak perlu unload.
-              */
-
-              if (
-                video.dataset.loaded !==
-                "true"
-              ) {
-
-                return;
-
-              }
-
-
-              const rect =
-                video.getBoundingClientRect();
-
-
-              /*
-                Benar-benar jauh
-                dari viewport.
-              */
-
-              const farAbove =
-                rect.bottom <
-                -900;
-
-
-              const farBelow =
-                rect.top >
-                window.innerHeight +
-                900;
-
-
-              if (
-                farAbove ||
-                farBelow
-              ) {
-
-                unloadVideo(
-                  video
-                );
-
-              }
-
-            }
-          );
-
-        },
-        {
-          rootMargin:
-            UNLOAD_ROOT_MARGIN,
-
-          threshold: 0
-        }
-      );
+    const unloadObserver = {
+      observe: function() {},
+      unobserve: function() {}
+    };
 
 
     /* =====================================================
@@ -1172,129 +1102,6 @@
 
 
     /* =====================================================
-       UNLOAD VIDEO
-    ====================================================== */
-
-    function unloadVideo(video) {
-
-      if (
-        !video
-      ) {
-
-        return;
-
-      }
-
-
-      const rect =
-        video.getBoundingClientRect();
-
-
-      /*
-        Jangan unload yang masih
-        dekat dengan viewport.
-      */
-
-      const stillNear =
-        rect.bottom >
-        -500 &&
-        rect.top <
-        window.innerHeight +
-        500;
-
-
-      if (
-        stillNear
-      ) {
-
-        return;
-
-      }
-
-
-      const source =
-        video.querySelector(
-          "source"
-        );
-
-
-      if (
-        !source
-      ) {
-
-        return;
-
-      }
-
-
-      try {
-
-        video.pause();
-
-      } catch (e) {}
-
-
-      /*
-        Lepaskan resource media.
-      */
-
-      source.removeAttribute(
-        "src"
-      );
-
-
-      try {
-
-        video.load();
-
-      } catch (e) {}
-
-
-      /*
-        Reset status.
-      */
-
-      video.dataset.loaded =
-        "false";
-
-
-      video.dataset.loading =
-        "false";
-
-
-      video.classList.remove(
-        "loaded"
-      );
-
-
-      const container =
-        video.parentElement;
-
-
-      if (
-        container
-      ) {
-
-        container.classList.add(
-          "loading-shimmer"
-        );
-
-      }
-
-
-      /*
-        Video akan load kembali
-        jika user scroll mendekatinya.
-      */
-
-      videoObserver.observe(
-        video
-      );
-
-    }
-
-
-    /* =====================================================
        VIDEO EVENTS
     ====================================================== */
 
@@ -1338,7 +1145,17 @@
           }
 
 
-          /* Rasio thumbnail dikunci 16:9 untuk semua video. */
+          /* Rasio mengikuti bentuk video asli: portrait atau landscape. */
+          if (video.videoWidth > 0 && video.videoHeight > 0) {
+            const ratio = video.videoWidth / video.videoHeight;
+            if (ratio < 0.9) {
+              container.classList.add("portrait");
+              container.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
+            } else {
+              container.classList.remove("portrait");
+              container.style.aspectRatio = "16 / 9";
+            }
+          }
 
         },
         {
