@@ -317,34 +317,21 @@
     ====================================================== */
 
     .main-feed {
-
-      padding: 15px;
-
+      width: 100%;
+      max-width: 900px;
+      margin: 0 auto;
+      padding: 12px 15px 24px;
       display: grid;
-
-      grid-template-columns:
-        repeat(2, minmax(0, 1fr));
-
-      gap: 12px;
-
-      grid-auto-flow: dense;
-
+      grid-template-columns: minmax(0, 1fr);
+      gap: 18px;
       align-items: start;
     }
 
-
-    @media (min-width: 600px) {
-
+    @media (max-width: 480px) {
       .main-feed {
-
-        grid-template-columns:
-          repeat(
-            auto-fill,
-            minmax(260px, 1fr)
-          );
-
+        padding: 8px 10px 20px;
+        gap: 14px;
       }
-
     }
 
 
@@ -421,9 +408,9 @@
     }
 
 
+    /* Semua thumbnail menggunakan rasio landscape 16:9 seperti YouTube. */
     .video-container.portrait {
-
-      aspect-ratio: 9 / 16;
+      aspect-ratio: 16 / 9;
     }
 
 
@@ -707,14 +694,6 @@
 
     <div
       class="tab-btn"
-      id="btn-all"
-      data-filter="all"
-    >
-      Semua Video
-    </div>
-
-    <div
-      class="tab-btn"
       id="btn-random"
       data-filter="random"
     >
@@ -817,7 +796,7 @@
     */
 
     const LAZY_ROOT_MARGIN =
-      "250px 0px";
+      "120px 0px";
 
 
     /*
@@ -826,7 +805,7 @@
     */
 
     const UNLOAD_ROOT_MARGIN =
-      "900px 0px";
+      "600px 0px";
 
 
     /* =====================================================
@@ -1359,43 +1338,7 @@
           }
 
 
-          /*
-            Deteksi portrait.
-
-            Landscape:
-            16:9
-
-            Portrait:
-            9:16
-          */
-
-          if (
-            this.videoWidth > 0 &&
-            this.videoHeight > 0
-          ) {
-
-            const ratio =
-              this.videoWidth /
-              this.videoHeight;
-
-
-            if (
-              ratio < 1
-            ) {
-
-              if (
-                container
-              ) {
-
-                container.classList.add(
-                  "portrait"
-                );
-
-              }
-
-            }
-
-          }
+          /* Rasio thumbnail dikunci 16:9 untuk semua video. */
 
         },
         {
@@ -1944,7 +1887,7 @@
       } else {
 
         filteredVideos =
-          [...rawVideos];
+          [...rawVideos].reverse();
 
       }
 
@@ -2971,8 +2914,6 @@
           if (
             currentFilter !==
             "latest" &&
-            currentFilter !==
-            "all" &&
             currentFilter !==
             "random"
           ) {
