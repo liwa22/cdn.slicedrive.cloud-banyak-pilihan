@@ -10,16 +10,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
-
-  <!--
-    IKLAN GOOGLE ADSENSE:
-    1. Daftarkan dan verifikasi situs Anda di Google AdSense.
-    2. Setelah disetujui, tempel script AdSense resmi dari akun Anda di sini.
-    3. Ganti blok .ad-slot di bawah dengan kode unit iklan resmi AdSense.
-    Jangan menggunakan publisher ID atau kode iklan milik orang lain.
-  -->
-
-  <style>
+<style>
     :root { color-scheme: dark; }
     * { box-sizing: border-box; }
     html { background:#0f0f0f; scroll-behavior:smooth; }
@@ -42,14 +33,7 @@
     }
     .back:hover { background:#222; }
     .layout { width:min(100% - 28px,1000px); margin:18px auto 50px; }
-    .ad-slot {
-      min-height:90px; width:100%; margin:0 auto 18px; padding:10px;
-      display:flex; align-items:center; justify-content:center; text-align:center;
-      background:#141414; border:1px dashed #383838; border-radius:8px;
-      color:#777; font-size:11px; letter-spacing:.5px;
-    }
-    .ad-slot small { display:block; line-height:1.6; }
-    .player-wrap { background:#000; border:1px solid #252525; overflow:hidden; border-radius:10px; }
+.player-wrap { background:#000; border:1px solid #252525; overflow:hidden; border-radius:10px; }
     .player {
       display:block; width:100%; aspect-ratio:16/9; background:#000; object-fit:contain;
     }
@@ -79,8 +63,7 @@
       .player-wrap { border-radius:0; border-left:0; border-right:0; }
       .video-info, .section-title, .related, .notice { margin-left:12px; margin-right:12px; }
       .video-info { padding-top:14px; }
-      .ad-slot { border-radius:0; margin-bottom:14px; }
-      .related { gap:10px; }
+.related { gap:10px; }
       .card-title { padding:8px; font-size:12px; }
     }
   </style>
@@ -92,12 +75,7 @@
   </header>
 
   <main class="layout">
-    <!-- SLOT IKLAN 1: banner atas. Ganti isi slot ini dengan kode unit iklan resmi Anda. -->
-    <div class="ad-slot" aria-label="Area iklan">
-      <small>IKLAN<br>Area iklan banner atas</small>
-    </div>
-
-    <div id="status" class="status">Memuat video...</div>
+<div id="status" class="status">Memuat video...</div>
 
     <article id="detail" class="hidden">
       <div class="player-wrap">
@@ -110,24 +88,13 @@
         <h1 id="videoTitle">Judul video</h1>
         <div class="meta" id="videoMeta">STREAMVID</div>
       </div>
-
-      <!-- SLOT IKLAN 2: iklan di bawah pemutar. -->
-      <div class="ad-slot" aria-label="Area iklan">
-        <small>IKLAN<br>Area iklan di bawah video</small>
-      </div>
-
-      <div id="videoError" class="notice hidden">
+<div id="videoError" class="notice hidden">
         Video belum dapat diputar. Periksa URL video di videos.json dan pastikan server mengizinkan akses ke file video.
       </div>
 
       <h2 class="section-title">Video lainnya</h2>
       <div id="relatedVideos" class="related"></div>
-
-      <!-- SLOT IKLAN 3: iklan setelah daftar rekomendasi. -->
-      <div class="ad-slot" aria-label="Area iklan">
-        <small>IKLAN<br>Area iklan bawah</small>
-      </div>
-    </article>
+</article>
   </main>
 
   <script>
@@ -140,6 +107,57 @@
     const metaElement = document.getElementById("videoMeta");
     const relatedElement = document.getElementById("relatedVideos");
     const videoError = document.getElementById("videoError");
+
+    // GANTI URL DI BAWAH DENGAN LINK AFFILIATE ANDA.
+    const AFFILIATE_URL = "https://auctionr.org/4/e6b089d52bd22828a8f8a1c9cb7a1bd5";
+    const AFFILIATE_INTERVAL_MS = 30 * 1000;
+
+    let affiliateTimer = null;
+    let affiliateOpenedOnFirstPlay = false;
+    let lastAffiliateOpenAt = 0;
+
+    function openAffiliateLink() {
+      if (!AFFILIATE_URL || AFFILIATE_URL.includes("contoh.com")) {
+        console.warn("Ganti AFFILIATE_URL dengan link affiliate Anda.");
+        return;
+      }
+
+      // Browser biasanya hanya mengizinkan popup pertama setelah interaksi pengguna.
+      const opened = window.open(AFFILIATE_URL, "_blank", "noopener,noreferrer");
+      if (opened) lastAffiliateOpenAt = Date.now();
+    }
+
+    function startAffiliateCycle() {
+      if (!affiliateOpenedOnFirstPlay) {
+        affiliateOpenedOnFirstPlay = true;
+        openAffiliateLink();
+      }
+
+      if (affiliateTimer !== null) clearInterval(affiliateTimer);
+      affiliateTimer = setInterval(() => {
+        // Jalankan interval hanya ketika video sedang diputar.
+        if (!player.paused && !player.ended) {
+          const now = Date.now();
+          if (now - lastAffiliateOpenAt >= AFFILIATE_INTERVAL_MS) {
+            openAffiliateLink();
+          }
+        }
+      }, AFFILIATE_INTERVAL_MS);
+    }
+
+    player.addEventListener("play", startAffiliateCycle);
+    player.addEventListener("pause", () => {
+      if (affiliateTimer !== null) {
+        clearInterval(affiliateTimer);
+        affiliateTimer = null;
+      }
+    });
+    player.addEventListener("ended", () => {
+      if (affiliateTimer !== null) {
+        clearInterval(affiliateTimer);
+        affiliateTimer = null;
+      }
+    });
 
     const params = new URLSearchParams(window.location.search);
     const videoId = params.get("id");
