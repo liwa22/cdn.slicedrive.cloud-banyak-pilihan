@@ -172,19 +172,22 @@
 
       const imageUrl = getThumbnail(video);
       if (imageUrl) {
+        // Utamakan thumbnail dari JSON jika tersedia.
         const image = document.createElement("img");
         image.src = imageUrl;
         image.alt = getTitle(video);
         image.loading = "lazy";
         image.decoding = "async";
         image.referrerPolicy = "no-referrer";
-        image.onerror = () => image.remove();
+        image.onerror = () => {
+          // Jika URL thumbnail ada tetapi gagal dimuat, gunakan frame video sebagai cadangan.
+          image.remove();
+          addVideoFrameFallback(thumb, video);
+        };
         thumb.appendChild(image);
       } else {
-        const placeholder = document.createElement("div");
-        placeholder.className = "thumb-placeholder";
-        placeholder.textContent = "▶";
-        thumb.appendChild(placeholder);
+        // Thumbnail belum ditambahkan ke JSON: ambil tampilan frame dari URL video.
+        addVideoFrameFallback(thumb, video);
       }
 
       const title = document.createElement("div");
@@ -193,6 +196,47 @@
 
       card.append(thumb, title);
       return card;
+    }
+
+    function addVideoFrameFallback(container, videoData) {
+      const videoUrl = getVideoUrl(videoData);
+      if (!videoUrl) {
+        const placeholder = document.createElement("div");
+        placeholder.className = "thumb-placeholder";
+        placeholder.textContent = "▶";
+        container.appendChild(placeholder);
+        return;
+      }
+
+      const preview = document.createElement("video");
+      preview.className = "related-preview";
+      preview.muted = true;
+      preview.playsInline = true;
+      preview.preload = "metadata";
+      preview.setAttribute("aria-label", "Pratinjau " + getTitle(videoData));
+      preview.style.cssText = "position:absolute;inset:0;width:100%;height:100%;object-fit:cover;background:#242424;";
+      preview.src = videoUrl;
+
+      // Coba tampilkan frame awal video sebagai thumbnail otomatis.
+      preview.addEventListener("loadedmetadata", function onMetadata() {
+        try {
+          if (Number.isFinite(preview.duration) && preview.duration > 0.6) {
+            preview.currentTime = 0.5;
+          }
+        } catch (_) {}
+      }, { once: true });
+
+      preview.addEventListener("error", function() {
+        preview.remove();
+        if (!container.querySelector(".thumb-placeholder, img, video")) {
+          const placeholder = document.createElement("div");
+          placeholder.className = "thumb-placeholder";
+          placeholder.textContent = "▶";
+          container.appendChild(placeholder);
+        }
+      }, { once: true });
+
+      container.appendChild(preview);
     }
 
     async function init() {
