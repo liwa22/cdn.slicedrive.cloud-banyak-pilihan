@@ -408,9 +408,10 @@
     }
 
 
-    /* Portrait memakai rasio video asli; landscape tetap 16:9. */
+    /* Semua thumbnail wajib rasio 16:9 seperti YouTube. */
+    .video-container,
     .video-container.portrait {
-      aspect-ratio: 9 / 16;
+      aspect-ratio: 16 / 9 !important;
     }
 
 
@@ -1145,17 +1146,9 @@
           }
 
 
-          /* Rasio mengikuti bentuk video asli: portrait atau landscape. */
-          if (video.videoWidth > 0 && video.videoHeight > 0) {
-            const ratio = video.videoWidth / video.videoHeight;
-            if (ratio < 0.9) {
-              container.classList.add("portrait");
-              container.style.aspectRatio = `${video.videoWidth} / ${video.videoHeight}`;
-            } else {
-              container.classList.remove("portrait");
-              container.style.aspectRatio = "16 / 9";
-            }
-          }
+          /* Semua thumbnail tetap 16:9, termasuk video portrait. */
+          container.classList.remove("portrait");
+          container.style.aspectRatio = "16 / 9";
 
         },
         {
@@ -1222,7 +1215,36 @@
 
       videoContainer.className =
         "video-container loading-shimmer";
+      videoContainer.style.aspectRatio = "16 / 9";
 
+      /*
+        THUMBNAIL CDN (format JSON baru).
+        Format lama tanpa Thumbnail tetap memakai preview video.
+      */
+      const thumbnailUrl =
+        String(videoData.Thumbnail || videoData.thumbnail || videoData.thumbnailUrl || "").trim();
+
+      if (thumbnailUrl) {
+        const thumbnailImage = document.createElement("img");
+        thumbnailImage.className = "thumbnail-image";
+        thumbnailImage.alt = videoData.Judul || "Thumbnail video";
+        thumbnailImage.loading = "lazy";
+        thumbnailImage.decoding = "async";
+        thumbnailImage.referrerPolicy = "no-referrer";
+        thumbnailImage.src = thumbnailUrl;
+        thumbnailImage.style.cssText = "display:block;width:100%;height:100%;object-fit:cover;position:absolute;inset:0;";
+        thumbnailImage.addEventListener("load", function() {
+          videoContainer.classList.remove("loading-shimmer");
+        }, { once: true });
+        thumbnailImage.addEventListener("error", function() {
+          thumbnailImage.remove();
+          videoContainer.classList.add("loading-shimmer");
+          // Jika thumbnail CDN gagal, preview video lama tetap tersedia.
+          videoContainer.appendChild(video);
+          videoObserver.observe(video);
+        }, { once: true });
+        videoContainer.appendChild(thumbnailImage);
+      }
 
       /*
         VIDEO
@@ -1297,9 +1319,9 @@
       );
 
 
-      videoContainer.appendChild(
-        video
-      );
+      if (!thumbnailUrl) {
+        videoContainer.appendChild(video);
+      }
 
 
       /*
