@@ -1,11 +1,8 @@
 
-<script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
-
 <script>
   const params = new URLSearchParams(window.location.search);
   const videoId = params.get("id");
 
-  // GANTI dengan URL iklan affiliate kamu
   const AD_URL = "https://auctionr.org/4/e6b089d52bd22828a8f8a1c9cb7a1bd5";
 
   let allVideos = [];
@@ -28,91 +25,115 @@
     }
   });
 
-  // Menjalankan iklan
+  // Buka iklan. Pemanggilan langsung dari klik pengguna
+  // lebih berpeluang diizinkan oleh browser.
   function triggerAd() {
-    if (!AD_URL || AD_URL === "https://auctionr.org/4/e6b089d52bd22828a8f8a1c9cb7a1bd5") {
-      console.warn("Silakan isi URL iklan pada variabel AD_URL.");
-      return;
-    }
+    if (!AD_URL) return;
 
-    window.open(AD_URL, '_blank', 'noopener,noreferrer');
+    const adWindow = window.open(AD_URL, '_blank');
+
+    if (adWindow) {
+      adWindow.opener = null;
+    } else {
+      console.warn(
+        "Iklan diblokir browser. Izinkan pop-up untuk situs ini."
+      );
+    }
   }
 
-  // Saat video mulai diputar
-  player.on('play', function () {
-    // Iklan pertama kali saat Play
-    if (!firstPlayAdTriggered) {
-      firstPlayAdTriggered = true;
-      triggerAd();
-    }
+  // Tangkap klik tombol Play secara langsung.
+  // Ini membantu agar iklan pertama tidak dianggap pop-up otomatis.
+  document.getElementById('playerWrapper').addEventListener(
+    'click',
+    function (event) {
+      const playButton = event.target.closest(
+        '.plyr__control[data-plyr="play"], .plyr__control--overlaid'
+      );
 
-    // Hindari membuat timer ganda
+      if (playButton && !firstPlayAdTriggered) {
+        firstPlayAdTriggered = true;
+        triggerAd();
+      }
+    },
+    true
+  );
+
+  function startAdTimer() {
     if (adTimer !== null) {
       clearInterval(adTimer);
     }
 
-    // Iklan berikutnya setiap 30 detik selama video diputar
     adTimer = setInterval(function () {
       if (!player.paused && !player.ended) {
         triggerAd();
       }
     }, 30000);
-  });
+  }
 
-  // Hentikan penghitung ketika video dijeda
-  player.on('pause', function () {
+  function stopAdTimer() {
     if (adTimer !== null) {
       clearInterval(adTimer);
       adTimer = null;
     }
+  }
+
+  // Saat video mulai diputar
+  player.on('play', function () {
+    if (!firstPlayAdTriggered) {
+      firstPlayAdTriggered = true;
+      triggerAd();
+    }
+
+    startAdTimer();
   });
 
-  // Hentikan penghitung ketika video selesai
-  player.on('ended', function () {
-    if (adTimer !== null) {
-      clearInterval(adTimer);
-      adTimer = null;
-    }
-  });
+  // Hentikan timer ketika video dijeda atau selesai
+  player.on('pause', stopAdTimer);
+  player.on('ended', stopAdTimer);
 
   // Ambil data video
   fetch('videos.json')
-    .then(res => {
+    .then(function (res) {
       if (!res.ok) {
-        throw new Error("Gagal memuat videos.json");
+        throw new Error('Gagal memuat videos.json');
       }
+
       return res.json();
     })
-    .then(data => {
+    .then(function (data) {
       allVideos = data;
 
-      const currentVideo = data.find(v => v.id === videoId);
+      const currentVideo = data.find(function (v) {
+        return String(v.id) === String(videoId);
+      });
 
       if (currentVideo) {
         setupPlayer(currentVideo);
         loadRecommendations(data, videoId);
       } else {
         document.getElementById('mainTitle').innerText =
-          "Video tidak ditemukan.";
+          'Video tidak ditemukan.';
       }
     })
-    .catch(error => {
+    .catch(function (error) {
       console.error(error);
+
       document.getElementById('mainTitle').innerText =
-        "Gagal memuat data video.";
+        'Gagal memuat data video.';
     });
 
   // Setup video player dan deteksi orientasi
   function setupPlayer(video) {
     document.getElementById('mainTitle').innerText = video.Judul;
-    document.getElementById('mainId').innerText = "ID: " + video.id;
+    document.getElementById('mainId').innerText = 'ID: ' + video.id;
 
     const videoElement = document.getElementById('player');
+    const wrapper = document.getElementById('playerWrapper');
+
     videoElement.src = video.Url;
 
     videoElement.onloadedmetadata = function () {
       const ratio = this.videoWidth / this.videoHeight;
-      const wrapper = document.getElementById('playerWrapper');
 
       if (ratio < 1) {
         wrapper.classList.add('portrait');
@@ -121,41 +142,47 @@
       }
     };
 
-    // Tidak memaksa autoplay agar klik Play pertama
-    // dapat menjadi pemicu iklan pertama.
+    // Video menunggu pengguna menekan Play.
   }
 
   // Muat rekomendasi video secara acak
   function loadRecommendations(data, currentId) {
     const grid = document.getElementById('recommendGrid');
-    grid.innerHTML = "";
+    grid.innerHTML = '';
 
-    const filtered = data.filter(v => v.id !== currentId);
-    const shuffled = filtered.sort(() => 0.5 - Math.random());
+    const filtered = data.filter(function (v) {
+      return String(v.id) !== String(currentId);
+    });
+
+    const shuffled = filtered.sort(function () {
+      return 0.5 - Math.random();
+    });
+
     const selection = shuffled.slice(0, 6);
 
-    selection.forEach(v => {
+    selection.forEach(function (v) {
       const card = document.createElement('div');
-      card.className = "rec-card";
+      card.className = 'rec-card';
 
       const thumb = document.createElement('div');
-      thumb.className = "rec-thumb";
+      thumb.className = 'rec-thumb';
 
       const thumbVid = document.createElement('video');
-      thumbVid.preload = "metadata";
+      thumbVid.preload = 'metadata';
       thumbVid.muted = true;
       thumbVid.playsInline = true;
 
       const source = document.createElement('source');
-      source.src = v.Url + "#t=0.5";
-      source.type = "video/mp4";
+      source.src = v.Url + '#t=0.5';
+      source.type = 'video/mp4';
+
       thumbVid.appendChild(source);
 
       const info = document.createElement('div');
-      info.className = "rec-info";
+      info.className = 'rec-info';
 
       const name = document.createElement('div');
-      name.className = "rec-name";
+      name.className = 'rec-name';
       name.textContent = v.Judul;
 
       thumb.appendChild(thumbVid);
@@ -165,12 +192,14 @@
 
       thumbVid.onloadedmetadata = function () {
         thumb.style.aspectRatio =
-          this.videoWidth / this.videoHeight < 1 ? "9/16" : "16/9";
+          this.videoWidth / this.videoHeight < 1
+            ? '9 / 16'
+            : '16 / 9';
       };
 
-      card.onclick = () => {
+      card.onclick = function () {
         window.location.href =
-          `detail.html?id=${encodeURIComponent(v.id)}`;
+          'detail.html?id=' + encodeURIComponent(v.id);
       };
 
       grid.appendChild(card);
