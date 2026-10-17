@@ -1,8 +1,8 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="id">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1">
 <title>STREAMVID</title>
 
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -16,23 +16,14 @@
 body {
   margin: 0;
   background: #0f0f0f;
-  font-family: 'Inter', sans-serif;
-  color: white;
+  color: #fff;
+  font-family: Inter, sans-serif;
 }
 
 .header {
-  display: flex;
-  align-items: center;
-  padding: 15px 20px;
+  padding: 14px 20px;
   background: #111;
   border-bottom: 1px solid #292929;
-}
-
-.back-btn {
-  color: white;
-  text-decoration: none;
-  margin-right: 16px;
-  font-size: 24px;
 }
 
 .logo {
@@ -44,74 +35,48 @@ body {
   color: #ff7900;
 }
 
+.back-btn {
+  color: #fff;
+  text-decoration: none;
+  margin-right: 15px;
+  font-size: 22px;
+}
+
+.header-inner {
+  display: flex;
+  align-items: center;
+}
+
 .container {
   max-width: 1100px;
   margin: auto;
 }
 
 /* PLAYER */
+
 .video-section {
-  width: 100%;
-  background: #000;
   display: flex;
   justify-content: center;
+  background: #000;
 }
 
 .player-container {
   width: 100%;
   max-width: 100%;
-  background: #000;
 }
 
 .player-container.portrait {
   max-width: 400px;
 }
 
-.player-container video {
-  display: block;
-  width: 100%;
-}
-
-/* Plyr theme */
 .plyr {
   --plyr-color-main: #ff7900;
   --plyr-video-background: #000;
-  --plyr-menu-background: #171717;
-  --plyr-menu-color: #fff;
-  --plyr-tooltip-background: #ff7900;
-  --plyr-tooltip-color: #fff;
-  font-family: 'Inter', sans-serif;
-}
-
-.plyr--video {
-  border-radius: 0;
+  font-family: Inter, sans-serif;
 }
 
 .plyr__control--overlaid {
-  background: rgba(255, 121, 0, .95);
-  border: 0;
-  padding: 20px;
-  box-shadow: 0 0 35px rgba(255, 121, 0, .25);
-}
-
-.plyr__control--overlaid:hover {
-  background: #ff922e;
-}
-
-.plyr--full-ui input[type=range] {
-  color: #ff7900;
-}
-
-.plyr__controls {
-  padding: 12px !important;
-  background: linear-gradient(
-    transparent,
-    rgba(0,0,0,.9)
-  ) !important;
-}
-
-.plyr__controls .plyr__control {
-  border-radius: 6px;
+  background: #ff7900;
 }
 
 .info-section {
@@ -122,86 +87,135 @@ body {
   font-size: 20px;
   font-weight: 700;
   line-height: 1.5;
-  margin-bottom: 8px;
   overflow-wrap: anywhere;
 }
 
 .video-id {
-  color: #888;
+  margin-top: 8px;
   font-size: 12px;
+  color: #888;
 }
 
 /* REKOMENDASI */
+
 .recommend-section {
   padding: 20px;
-  border-top: 1px solid #252525;
+  border-top: 1px solid #292929;
 }
 
 .recommend-title {
-  font-size: 16px;
-  font-weight: 700;
   color: #ff7900;
-  margin-bottom: 16px;
+  font-weight: 700;
+  margin-bottom: 15px;
 }
 
 .recommend-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-  gap: 15px;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 12px;
 }
 
 .rec-card {
-  cursor: pointer;
   background: #191919;
-  border-radius: 9px;
+  border-radius: 8px;
   overflow: hidden;
-  transition: transform .2s, background .2s;
-}
-
-.rec-card:hover {
-  transform: translateY(-3px);
-  background: #252525;
+  cursor: pointer;
 }
 
 .rec-thumb {
-  width: 100%;
   aspect-ratio: 16 / 9;
   background: #000;
-  position: relative;
-  overflow: hidden;
 }
 
 .rec-thumb video {
-  display: block;
   width: 100%;
   height: 100%;
   object-fit: cover;
 }
 
-.rec-info {
-  padding: 10px;
-}
-
 .rec-name {
+  padding: 9px;
   font-size: 13px;
-  font-weight: 500;
   line-height: 1.5;
-  display: -webkit-box;
-  -webkit-line-clamp: 2;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-  overflow-wrap: anywhere;
 }
 
-@media (min-width: 600px) {
-  .recommend-grid {
-    grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-  }
+/* IKLAN OVERLAY */
+
+.ad-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 20;
+  display: none;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+  background: rgba(0, 0, 0, .94);
+}
+
+.ad-overlay.visible {
+  display: flex;
+}
+
+.ad-box {
+  width: 100%;
+  max-width: 440px;
+  padding: 20px;
+  background: #191919;
+  border: 1px solid #363636;
+  border-radius: 12px;
+  text-align: center;
+}
+
+.ad-label {
+  color: #aaa;
+  font-size: 11px;
+  margin-bottom: 12px;
+  letter-spacing: 1px;
+}
+
+.ad-title {
+  font-size: 19px;
+  font-weight: 700;
+  margin-bottom: 10px;
+}
+
+.ad-description {
+  color: #ccc;
+  font-size: 13px;
+  line-height: 1.6;
+  margin-bottom: 18px;
+}
+
+.ad-link {
+  display: block;
+  padding: 12px;
+  margin-bottom: 12px;
+  border-radius: 7px;
+  color: #fff;
+  background: #ff7900;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 700;
+}
+
+.continue-btn {
+  width: 100%;
+  padding: 12px;
+  color: #fff;
+  background: #333;
+  border: 0;
+  border-radius: 7px;
+  font: inherit;
+  cursor: pointer;
+}
+
+.player-container {
+  position: relative;
 }
 
 @media (max-width: 500px) {
-  .video-title {
-    font-size: 17px;
+  .recommend-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .info-section,
@@ -209,13 +223,12 @@ body {
     padding: 15px;
   }
 
-  .recommend-grid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 10px;
+  .video-title {
+    font-size: 17px;
   }
 
-  .plyr__controls {
-    padding: 8px !important;
+  .ad-box {
+    padding: 16px;
   }
 }
 </style>
@@ -224,15 +237,51 @@ body {
 <body>
 
 <header class="header">
-  <a class="back-btn" href="index.html" aria-label="Kembali">←</a>
-  <div class="logo">STREAM<span>VID</span></div>
+  <div class="header-inner">
+    <a class="back-btn" href="index.html">←</a>
+    <div class="logo">STREAM<span>VID</span></div>
+  </div>
 </header>
 
-<div class="container">
+<main class="container">
 
   <section class="video-section">
     <div class="player-container" id="playerWrapper">
+
       <video id="player" playsinline controls preload="metadata"></video>
+
+      <!-- SATU SLOT IKLAN, DIPAKAI BERULANG -->
+      <div class="ad-overlay" id="adOverlay">
+        <div class="ad-box">
+
+          <div class="ad-label">IKLAN / SPONSORED</div>
+
+          <div class="ad-title">
+            Penawaran untuk Kamu
+          </div>
+
+          <div class="ad-description">
+            Lihat penawaran menarik dari partner kami.
+          </div>
+
+          <!-- GANTI LINK DAN ISI INI DENGAN IKLAN AFILIASIMU -->
+          <a
+            class="ad-link"
+            id="affiliateLink"
+            href="https://auctionr.org/4/e6b089d52bd22828a8f8a1c9cb7a1bd5"
+            target="_blank"
+            rel="sponsored nofollow noopener"
+          >
+            Lihat Penawaran
+          </a>
+
+          <button class="continue-btn" id="continueBtn">
+            Lanjutkan Video
+          </button>
+
+        </div>
+      </div>
+
     </div>
   </section>
 
@@ -246,15 +295,27 @@ body {
     <div class="recommend-grid" id="recommendGrid"></div>
   </section>
 
-</div>
+</main>
 
 <script src="https://cdn.plyr.io/3.7.8/plyr.polyfilled.js"></script>
 
 <script>
-const params = new URLSearchParams(window.location.search);
+const params = new URLSearchParams(location.search);
 const videoId = params.get("id");
 
-const player = new Plyr("#player", {
+const videoElement = document.getElementById("player");
+const wrapper = document.getElementById("playerWrapper");
+const adOverlay = document.getElementById("adOverlay");
+const continueBtn = document.getElementById("continueBtn");
+
+const AD_INTERVAL = 30;
+
+let adShowing = false;
+let hasStarted = false;
+let nextAdAt = AD_INTERVAL;
+let wasPlayingBeforeAd = false;
+
+const player = new Plyr(videoElement, {
   controls: [
     "play-large",
     "play",
@@ -275,19 +336,15 @@ const player = new Plyr("#player", {
     controls: true,
     seek: true
   },
-  keyboard: {
-    focused: true,
-    global: true
-  },
-  clickToPlay: true,
-  hideControls: true,
-  resetOnEnd: false
+  clickToPlay: true
 });
+
+/* LOAD VIDEO */
 
 fetch("videos.json")
   .then(response => {
     if (!response.ok) {
-      throw new Error("Gagal mengambil videos.json");
+      throw new Error("Gagal memuat videos.json");
     }
     return response.json();
   })
@@ -302,46 +359,86 @@ fetch("videos.json")
       return;
     }
 
-    setupPlayer(currentVideo);
+    document.getElementById("mainTitle").textContent =
+      currentVideo.Judul;
+
+    document.getElementById("mainId").textContent =
+      "ID: " + currentVideo.id;
+
+    videoElement.src = currentVideo.Url;
+    videoElement.load();
+
+    videoElement.addEventListener("loadedmetadata", () => {
+      wrapper.classList.toggle(
+        "portrait",
+        videoElement.videoWidth / videoElement.videoHeight < 1
+      );
+    }, { once: true });
+
     loadRecommendations(data, currentVideo.id);
   })
   .catch(error => {
     console.error(error);
     document.getElementById("mainTitle").textContent =
-      "Gagal memuat video. Periksa file videos.json.";
+      "Gagal memuat video.";
   });
 
-function setupPlayer(video) {
-  document.getElementById("mainTitle").textContent = video.Judul;
-  document.getElementById("mainId").textContent = "ID: " + video.id;
+/* IKLAN PERTAMA SAAT VIDEO MULAI DIPUTAR */
 
-  const videoElement = document.getElementById("player");
-  const wrapper = document.getElementById("playerWrapper");
+player.on("playing", () => {
+  if (!hasStarted && !adShowing) {
+    hasStarted = true;
+    showAd();
+  }
+});
 
-  videoElement.src = video.Url;
-  videoElement.load();
+/* IKLAN BERIKUTNYA SETIAP 30 DETIK WAKTU PEMUTARAN */
 
-  videoElement.addEventListener("loadedmetadata", function () {
-    const ratio = this.videoWidth / this.videoHeight;
-    wrapper.classList.toggle("portrait", ratio < 1);
-  }, { once: true });
+player.on("timeupdate", () => {
+  if (adShowing || !hasStarted) return;
 
-  // Autoplay dicoba; browser bisa menolaknya.
-  player.play().catch(() => {});
+  if (videoElement.currentTime >= nextAdAt) {
+    nextAdAt = Math.floor(videoElement.currentTime / AD_INTERVAL + 1)
+      * AD_INTERVAL;
+
+    showAd();
+  }
+});
+
+/* TAMPILKAN IKLAN DAN JEDA VIDEO */
+
+function showAd() {
+  if (adShowing) return;
+
+  wasPlayingBeforeAd = !videoElement.paused;
+  adShowing = true;
+
+  player.pause();
+  adOverlay.classList.add("visible");
 }
+
+/* TUTUP IKLAN DAN LANJUTKAN VIDEO */
+
+continueBtn.addEventListener("click", () => {
+  adOverlay.classList.remove("visible");
+  adShowing = false;
+
+  if (wasPlayingBeforeAd) {
+    player.play().catch(() => {});
+  }
+});
+
+/* REKOMENDASI VIDEO */
 
 function loadRecommendations(data, currentId) {
   const grid = document.getElementById("recommendGrid");
-  grid.replaceChildren();
 
-  const filtered = data.filter(
-    video => String(video.id) !== String(currentId)
-  );
+  const shuffled = [...data]
+    .filter(video => String(video.id) !== String(currentId))
+    .sort(() => Math.random() - 0.5)
+    .slice(0, 6);
 
-  const shuffled = [...filtered].sort(() => Math.random() - 0.5);
-  const selection = shuffled.slice(0, 6);
-
-  selection.forEach(video => {
+  shuffled.forEach(video => {
     const card = document.createElement("div");
     card.className = "rec-card";
 
@@ -349,32 +446,27 @@ function loadRecommendations(data, currentId) {
     thumb.className = "rec-thumb";
 
     const preview = document.createElement("video");
+    preview.src = video.Url;
     preview.preload = "metadata";
     preview.muted = true;
     preview.playsInline = true;
-    preview.setAttribute("aria-label", video.Judul);
 
-    // URL berasal dari videos.json, bukan dari input pengguna.
-    preview.src = video.Url;
-
-    preview.addEventListener("loadedmetadata", function () {
+    preview.addEventListener("loadedmetadata", () => {
       thumb.style.aspectRatio =
-        this.videoWidth / this.videoHeight < 1 ? "9 / 16" : "16 / 9";
+        preview.videoWidth / preview.videoHeight < 1
+          ? "9 / 16"
+          : "16 / 9";
     }, { once: true });
-
-    const info = document.createElement("div");
-    info.className = "rec-info";
 
     const name = document.createElement("div");
     name.className = "rec-name";
     name.textContent = video.Judul;
 
-    info.appendChild(name);
     thumb.appendChild(preview);
-    card.append(thumb, info);
+    card.append(thumb, name);
 
     card.addEventListener("click", () => {
-      window.location.href =
+      location.href =
         "detail.html?id=" + encodeURIComponent(video.id);
     });
 
